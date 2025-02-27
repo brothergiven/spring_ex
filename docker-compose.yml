@@ -1,0 +1,48 @@
+version: '3.8'
+
+services:
+  # spring boot application
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+
+    container_name: spring-app
+    ports:
+      - "8080:8080"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://${DATABASE_HOST}:${DATABASE_PORT}/${DATABASE_NAME}?useSSL=false&serverTimezone=UTC
+      SPRING_DATASOURCE_USERNAME: ${DATABASE_USER}
+      SPRING_DATASOURCE_PASSWORD: ${DATABASE_PASSWORD}
+    depends_on:
+      - db
+    networks:
+      - app-network
+
+
+  # MySQL DB
+  db:
+    image: mysql:8.0
+    container_name: mysql-db
+    ports:
+      - "3306:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_DATABASE: ${DATABASE_NAME}
+      MYSQL_USER: ${DATABASE_USER}
+      MYSQL_PASSWORD: ${DATABASE_PASSWORD}
+    volumes:
+      - mysql-data:/var/lib/mysql
+    networks:
+      - app-network
+
+# 데이터 영속화 볼륨 설정
+volumes:
+  mysql-data:
+
+# 네트워크 설정
+networks: 
+  app-network:
+
+ 
+    
